@@ -3,17 +3,23 @@ import random
 
 WORDS = ["version", "python", "git", "github", "snowman", "meltdown", "bubble", "environment", "random"]
 
+BLUE = "\033[94m"
+RED = "\033[91m"
+RESET = "\033[0m"
+
 def get_random_word():
-    return WORDS[random.randint(0, len(WORDS) - 1)]
+    return random.choice(WORDS)
 
 def display_game_state(mistakes, secret_word, guessed_letters):
-    print(STAGES[mistakes])
+    print(BLUE + STAGES[mistakes] + RESET)
+
     display_word = ""
     for letter in secret_word:
         if letter in guessed_letters:
-            display_word += letter + " "
+            display_word += BLUE + letter + " " + RESET
         else:
             display_word += "_ "
+
     print("Word:", display_word)
     print()
 
@@ -23,13 +29,13 @@ def play_game():
     mistakes = 0
     max_mistakes = len(STAGES) - 1
 
-    print("Welcome to Snowman Meltdown!")
+    print(BLUE + "Welcome to Snowman Meltdown!" + RESET)
 
     while True:
         display_game_state(mistakes, secret_word, guessed_letters)
 
         if mistakes >= max_mistakes:
-            print("You are too hot - GAME OVER! The snowman melted!")
+            print(RED + "You are too hot - GAME OVER! The snowman melted!" + RESET)
             print("The word was:", secret_word)
             break
 
@@ -39,22 +45,24 @@ def play_game():
                 word_guessed = False
 
         if word_guessed:
-            print("You saved the snowman! ❄️")
+            print(BLUE + "You saved the snowman! ❄️" + RESET)
             break
 
         guess = input("Guess a letter: ").lower()
 
-        if guess in guessed_letters:
-            print("You already guessed that letter.\n")
+        # Input validation: only a single letter a-z
+        if len(guess) != 1 or guess < "a" or guess > "z":
+            print(RED + "Please enter ONE letter (a-z).\n" + RESET)
             continue
 
-        if guess in secret_word:
-            guessed_letters.append(guess)
-            print("Correct guess!\n")
-        else:
-            guessed_letters.append(guess)
-            mistakes = mistakes + 1
-            print("Wrong guess!\n")
+        if guess in guessed_letters:
+            print(RED + "You already guessed that letter.\n" + RESET)
+            continue
 
-if __name__ == "__main__":
-    play_game()
+        guessed_letters.append(guess)
+
+        if guess not in secret_word:
+            mistakes += 1
+            print(RED + "Wrong guess!\n" + RESET)
+        else:
+            print(BLUE + "Correct guess!\n" + RESET)
